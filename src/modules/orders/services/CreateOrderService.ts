@@ -31,69 +31,67 @@ class CreateOrderService {
   ) {}
 
   public async execute({ customer_id, products }: IRequest): Promise<Order> {
-    const customer_exits = await this.customersRepository.findById(customer_id);
+    const customerExists = await this.customersRepository.findById(customer_id);
 
-    if (!customer_exits) {
+    if (!customerExists) {
       throw new AppError('Error, this customer does not exists');
     }
 
-    // const existent_products = await this.productsRepository.findAllById(
-    //   products,
-    // );
+    const existentProducts = await this.productsRepository.findAllById(
+      products,
+    );
 
-    // if (!existent_products.length) {
-    //   throw new AppError('could not find any products with this ids');
-    // }
+    if (!existentProducts.length) {
+      throw new AppError('Could not find any products with the given ids');
+    }
 
-    // const products_ids = existent_products.map(product => product.id);
+    const existentProductsIds = existentProducts.map(product => product.id);
 
-    // const product_exists_in_array = products.filter(
-    //   product => !products_ids.includes(product.id),
-    // );
+    const checkInexistentProducts = products.filter(
+      product => !existentProductsIds.includes(product.id),
+    );
 
-    // if (product_exists_in_array.length) {
-    //   throw new AppError(
-    //     `could not find product ${product_exists_in_array[0].id}`,
-    //   );
-    // }
+    if (checkInexistentProducts.length) {
+      throw new AppError(
+        `Could not find product ${checkInexistentProducts[0].id}`,
+      );
+    }
 
-    // console.log('products_without_quantity =>>>>', product_exists_in_array);
+    const findProductsWIthNoQuantityAvailable = products.filter(
+      product =>
+        existentProducts.filter(p => p.id === product.id)[0].quantity <
+        product.quantity,
+    );
 
-    // const products_without_quantity = products.filter(
-    //   product =>
-    //     product_exists_in_array.filter(p => p.id === product.id)[0].quantity <=
-    //     product.quantity,
-    // );
+    if (findProductsWIthNoQuantityAvailable.length) {
+      throw new AppError(
+        `The quantity ${findProductsWIthNoQuantityAvailable[0].quantity} if not available for ${findProductsWIthNoQuantityAvailable[0].id}`,
+      );
+    }
 
-    // if (products_without_quantity.length) {
-    //   throw new AppError(
-    //     `the quantity ${products_without_quantity[0].quantity} is not available for ${products_without_quantity[0].id}`,
-    //   );
-    // }
+    const serializedProducts = products.map(product => ({
+      product_id: product.id,
+      quantity: product.quantity,
+      price: existentProducts.filter(p => p.id === product.id)[0].price,
+    }));
 
-    // const serialized_products = products.map(product => ({
-    //   product_id: product.id,
-    //   quantity: product.quantity,
-    //   price: existent_products.filter(p => p.id === product.id)[0].price,
-    // }));
+    const order = await this.ordersRepository.create({
+      customer: customerExists,
+      products: serializedProducts,
+    });
 
-    // const order = await this.ordersRepository.create({
-    //   customer: customer_exits,
-    //   products: serialized_products,
-    // });
+    const { order_products } = order;
 
-    // const { order_products } = order;
+    const orderedProductsQuantity = order_products.map(product => ({
+      id: product.product_id,
+      quantity:
+        existentProducts.filter(p => p.id === product.product_id)[0].quantity -
+        product.quantity,
+    }));
 
-    // const ordered_products_quantity = order_products.map(product => ({
-    //   id: product.product_id,
-    //   quantity:
-    //     existent_products.filter(p => p.id === product.product_id)[0].quantity -
-    //     product.quantity,
-    // }));
+    await this.productsRepository.updateQuantity(orderedProductsQuantity);
 
-    // await this.productsRepository.updateQuantity(ordered_products_quantity);
-
-    // return order;
+    return order;
   }
 }
 

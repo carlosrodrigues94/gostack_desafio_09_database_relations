@@ -29,7 +29,7 @@ export default class OrderTable1594854341605 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<any> {
+  public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('orders');
   }
 }

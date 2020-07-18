@@ -19,14 +19,12 @@ export default class OrderProductsTable1594854412550
           {
             name: 'price',
             type: 'decimal',
-            precision: 1,
-            scale: 1,
+            precision: 20,
+            scale: 2,
           },
           {
             name: 'quantity',
-            type: 'decimal',
-            precision: 1,
-            scale: 1,
+            type: 'int',
           },
           {
             name: 'created_at',
@@ -43,7 +41,7 @@ export default class OrderProductsTable1594854412550
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<any> {
+  public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('orders_products');
   }
 }
