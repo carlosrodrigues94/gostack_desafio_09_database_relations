@@ -23,9 +23,10 @@
 
 ## :rocket: Sobre o desafio
 
-Foi desenvolvido nessa desafio uma aplicação destinada a restaurantes, Go Restaurant, nessa aplicação pode ser feito o cadastro dos pratos, atualização dos dados referente a cada prato, exclusão de pratos e mudança de disponibilidade conforme estoque.
+Essa é uma API contruída em Node js com Typescript, nela é possível fazer o cadastro de produtos com a respectiva quantidade de estoque, reservar os produtos para a venda e validar as quantidades e produtor existentes.
 
-<img alt="GoStack" src="./desafio-10.gif" />
+<img alt="GoStack" src="./desafio-09.gif" />
+<img alt="GoStack" src="./desafio-09-tests.png" />
 
 ## :calendar: Entrega
 
